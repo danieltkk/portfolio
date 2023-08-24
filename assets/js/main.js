@@ -199,19 +199,46 @@
   /**
    * Portfolio details slider
    */
-  new Swiper('.portfolio-details-slider', {
+  var portfolioSwiper = new Swiper('.portfolio-details-slider', {
     speed: 400,
     loop: true,
     autoplay: {
-      delay: 5000,
-      disableOnInteraction: false
+        delay: 5000,
+        disableOnInteraction: true
     },
     pagination: {
-      el: '.swiper-pagination',
-      type: 'bullets',
-      clickable: true
+        el: '.swiper-pagination',
+        type: 'bullets',
+        clickable: true
+    },
+    on: {
+        slideChangeTransitionStart: function () {
+            var activeSlide = this.slides[this.activeIndex];
+            var isVideoSlide = activeSlide.classList.contains('video-slide');
+
+            if (isVideoSlide) {
+                // Get the video element inside the current video slide
+                var videoElement = activeSlide.querySelector('video');
+
+                // Pause autoplay
+                portfolioSwiper.autoplay.stop();
+
+                // Listen for the 'ended' event of the video
+                videoElement.addEventListener('ended', function () {
+                    // Wait until the video ends to move to the next slide
+                    setTimeout(function () {
+                        portfolioSwiper.slideNext();
+                        portfolioSwiper.autoplay.start(); // Resume autoplay
+                    }, 0); // Delay execution to ensure proper behavior
+                });
+
+                // Start playing the video
+                videoElement.play();
+            }
+        }
     }
-  });
+});
+
 
   /**
    * Testimonials slider
